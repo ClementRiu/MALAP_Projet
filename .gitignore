@@ -1,0 +1,7 @@
+__pycache__/
+nearest_neighbours_temp.py
+
+Datasets/*
+Datasets.zip
+!Datasets/Credit_Card_Fraud_Detection/creditcard.csv
+!Datasets/Credit_Card_Fraud_Detection/Credit_Card_Fraud_Detection.txt
