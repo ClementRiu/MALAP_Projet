@@ -7,7 +7,15 @@ import sklearn.model_selection as skms
 import nearest_neighbours
 import tools
 
-def import_datas_cardfraud():
+def import_datas_cardfraud(sampling=1):
+	"""
+	Args:
+	    sampling (float, optional): Ratio (between 0 and 1) of data used.
+	
+	Returns:
+	    ndarray: X, x_train, x_test: datas descriptor
+		ndarray: Y, y_train, y_test: datas label
+	"""
 
 	### Données credit card : le fichier Datasets ne doit pas avoir été bougé.
 	print("Import des données Credit Card Fraud Detection...")
@@ -54,6 +62,14 @@ def import_datas_cardfraud():
 
 	# Split des données :
 	x_train, x_test, y_train, y_test = skms.train_test_split(X, Y, test_size=0.33, random_state=42)
+	x_train = x_train[:int(sampling * x_train.shape[0]), :]
+	x_test = x_test[:int(sampling * x_test.shape[0]), :]
+	y_train = y_train[:int(sampling * len(y_train))]
+	y_test = y_test[:int(sampling * len(y_test))]
+
+	X = np.vstack((x_train, x_test))
+	Y = np.hstack((y_train, y_test))
+
 	return X, Y, x_train, x_test, y_train, y_test
 
 if __name__ == "__main__":
@@ -64,7 +80,7 @@ if __name__ == "__main__":
 
 	### Données credit card : le fichier Datasets ne doit pas avoir été bougé.
 	
-	_, _, x_train, x_test, y_train, y_test = import_datas_cardfraud()
+	_, _, x_train, x_test, y_train, y_test = import_datas_cardfraud(0.5)
 
 
 	# # Chargement du classifieur :
