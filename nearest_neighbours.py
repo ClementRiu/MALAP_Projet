@@ -7,16 +7,19 @@ import tools
 
 class Nearest_Neighbours:
 	def __init__(self, k=1, alpha=1):
+		self.negativ = False
 		self.k = k
 		self.alpha = alpha
 
 	def fit(self, data, label):
-		data, label = data.reshape(len(label), -1), label.reshape(-1, 1)
+		data = data.reshape(len(label), -1)
 		nb_ex, self.dim = data.shape
 		ylab = set(label.flat)
 		if len(ylab) > 2:
 			print("pas bon nombres de labels (%d)" % (ylab,))
 			return
+		elif len(ylab) == 2:
+			self.negativ = True
 		self.label = label
 		self.data = data
 
@@ -34,15 +37,18 @@ class Nearest_Neighbours:
 			z = data[index,:]
 			index_NN = self.find_index_NN(z)
 			z_NN = self.data[index_NN, :]
-			index_NN_NN = self.find_index_NN(z_NN, index_NN)
-			z_NN_NN = self.data[index_NN_NN, :]
-
-			if npl.norm(z- z_NN) < self.alpha * npl.norm(z_NN - z_NN_NN):
-				self.lines1.append([z, z_NN])
-				self.lines2.append([z_NN, z_NN_NN])
-				label[index] = 1
-			else:
+			if self.negativ == True and self.label[index_NN] == -1:
 				label[index] = -1
+			else:
+				index_NN_NN = self.find_index_NN(z_NN, index_NN)
+				z_NN_NN = self.data[index_NN_NN, :]
+
+				if npl.norm(z- z_NN) < self.alpha * npl.norm(z_NN - z_NN_NN):
+					self.lines1.append([z, z_NN])
+					self.lines2.append([z_NN, z_NN_NN])
+					label[index] = 1
+				else:
+					label[index] = -1
 		return label
 
 	def score(self, data, label):
@@ -56,7 +62,7 @@ class Nearest_Neighbours:
 		pred_label = self.predict(data)
 		return tools.partial_score(label, pred_label, 1)
 
-	def visualisation(self, a, b, data):
+	def visualisation(self, data):
 		self.predict(data)
 
 		lc1 = mc.LineCollection(self.lines1, color="r")
@@ -66,8 +72,7 @@ class Nearest_Neighbours:
 		ax.add_collection(lc2)
 		ax.autoscale()
 		ax.margins(0.1)
-		# tools.plot_data(self.data, self.label)
-		tools.plot_data(a, b)
+		tools.plot_data(self.data, self.label)
 		tools.plot_data(data, self.predict(data), dec=2)
 		plt.show()
 
