@@ -48,16 +48,13 @@ class Nearest_Neighbours:
 	def score(self, data, label):
 		return np.mean(label == self.predict(data))
 
-	def partial_score(self, a, b, in_out=1):
-		return np.sum(a + b == in_out * 2 * np.ones(len(a))) / np.sum(a == in_out)
-
 	def outlier_score(self, data, label):
 		pred_label = self.predict(data)
-		return self.partial_score(label, pred_label, -1)
+		return tools.partial_score(label, pred_label, -1)
 
 	def inlier_score(self, data, label):
 		pred_label = self.predict(data)
-		return self.partial_score(label, pred_label, 1)
+		return tools.partial_score(label, pred_label, 1)
 
 	def visualisation(self, a, b, data):
 		self.predict(data)

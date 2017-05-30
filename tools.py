@@ -4,6 +4,10 @@ import random
 import matplotlib.pyplot as plt
 from matplotlib.legend_handler import HandlerLine2D
 
+
+def partial_score(a, b, in_out=1):
+    return np.sum(a + b == in_out * 2 * np.ones(len(a))) / np.sum(a == in_out)
+
 def plot_data(data, labels=None, dec=0):
     """
     Affiche des donnees 2D
