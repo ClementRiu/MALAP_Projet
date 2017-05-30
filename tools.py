@@ -82,6 +82,11 @@ def import_datas_cardfraud(sampling=1):
 def partial_score(a, b, in_out=1):
     return np.sum(a + b == in_out * 2 * np.ones(len(a))) / np.sum(a == in_out)
 
+def Accuracy(ytest, ypred):
+    nber_true_pos = np.sum(ytest + ypred == 1 * 2 * np.ones(len(ytest)))
+    nber_true_neg = np.sum(ytest + ypred == -1 * 2 * np.ones(len(ytest)))
+    return 100*(nber_true_pos+nber_true_neg)/(len(ytest))
+
 def plot_data(data, labels=None, dec=0):
     """
     Affiche des donnees 2D
