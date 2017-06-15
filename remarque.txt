@@ -1,0 +1,12 @@
+En priorité je dirais de faire du non-supervisé (donc sans les labels) et comparer les performances parce que Obozinski a beaucoup râlé sur cette absence
+
+Ensuite, si on peut, faire du k plus proche voisin (mais ce serait plutôt Clément du coup)
+
+Et enfin... Le rapport ^^' sauf si on fait encore autre chose
+
+Concernant l'algo du plus proche voisin :
+-mériterait d'être comparé avec des k plus proches voisins, voire faire de la cross validation sur le nombre de voisins à prendre
+
+-OSVM -> pas utilisé dans les règles de l'art, donc avec des données non étiquettées
+
+-et en règle générale, "on a pas les spécificités du sujet de la détection d'anomalie

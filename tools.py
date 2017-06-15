@@ -12,7 +12,7 @@ import sklearn.model_selection as skms
 
 
 
-def import_datas_cardfraud(sampling=1):
+def import_datas_cardfraud(sampling=1, test_ratio=0.5):
     """
     Args:
         sampling (float, optional): Ratio (between 0 and 1) of data used.
@@ -66,7 +66,7 @@ def import_datas_cardfraud(sampling=1):
     print("Avant sampling :\nNombre de données positive : {}\nNombre de données négatives : {}\nPourcentage négative sur positive : {}%".format(np.sum(Y == 1), np.sum(Y == -1), 100 * np.sum(Y == -1) / np.sum(Y == 1)))
 
     # Split des données :
-    x_train, x_test, y_train, y_test = skms.train_test_split(X, Y, test_size=0.33) #, random_state=42)
+    x_train, x_test, y_train, y_test = skms.train_test_split(X, Y, test_size=test_ratio) #, random_state=42)
     x_train = x_train[:int(sampling * x_train.shape[0]), :]
     x_test = x_test[:int(sampling * x_test.shape[0]), :]
     y_train = y_train[:int(sampling * len(y_train))]
@@ -198,12 +198,18 @@ def gen_unbalanced(nbex_pos=100, nbex_neg=0, epsilon=0.5, data_type=0, sigma=0.1
             data=xpos.T
             y=np.ones(nbex_pos)
 
-    # un peu de bruit
-    data[:, 0] += np.random.normal(0, epsilon, nbex_pos + nbex_neg)
-    data[:, 1] += np.random.normal(0, epsilon, nbex_pos + nbex_neg)
-    # on mélange les données
-    idx = np.random.permutation((range(y.size)))
-    data = data[idx, :]
-    y = y[idx]
-    return data, y
+    if data_type not in {0, 1}:
+        try:
+            raise ValueError("Datatype not supported")
+        except ValueError as err:
+            print(err)
+    else:
+        # un peu de bruit
+        data[:, 0] += np.random.normal(0, epsilon, nbex_pos + nbex_neg)
+        data[:, 1] += np.random.normal(0, epsilon, nbex_pos + nbex_neg)
+        # on mélange les données
+        idx = np.random.permutation((range(y.size)))
+        data = data[idx, :]
+        y = y[idx]
+        return data, y
 
