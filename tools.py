@@ -213,3 +213,37 @@ def gen_unbalanced(nbex_pos=100, nbex_neg=0, epsilon=0.5, data_type=0, sigma=0.1
         y = y[idx]
         return data, y
 
+def mat_confusion(real,pred):
+    int_v = np.vectorize(int)
+
+    tp = np.dot(int_v(real==1),int_v(pred==1))
+    tn = np.dot(int_v(real==-1),int_v(pred==-1))
+    fn = np.dot(int_v(real==1),int_v(pred==-1))
+    fp = np.dot(int_v(real==-1),int_v(pred==1))
+
+    return tp,tn,fp,fn
+
+def stat_learning(real,pred):
+    tp,tn,fp,fn = mat_confusion(real,pred)
+    sensivity = tp / (tp + fn)
+    specifity = tn / (fp+tn)
+    error1 = 1-specifity
+    error2 = 1-sensivity
+    precision = tp/(fp+tp)
+
+    return sensivity,specifity,error1,error2,precision
+
+def print_stat(real,pred):
+    tp,tn,fp,fn = mat_confusion(real,pred)
+    sensivity,specifity,error1,error2,precision = stat_learning(real,pred)
+    print("\n \t Prédit 1 \t Prédit -1")
+    print("Vrai 1 \t %d \t\t %d" %(tp,fn))
+    print("Vrai -1  %d \t\t %d" %(fp,tn))
+    print("\n")
+    print("Specifity: %.4f" %specifity)
+    print("Sensivity: %.4f" %sensivity)
+
+def progress(current,final,nber_block):
+    step = final // nber_block
+    if current % step == 0:
+        print("#", end='', flush=True)
