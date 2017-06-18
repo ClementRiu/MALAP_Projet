@@ -12,7 +12,7 @@ import sklearn.model_selection as skms
 
 
 
-def import_datas_cardfraud(sampling=1, test_ratio=0.5):
+def import_datas_cardfraud(sampling=1, test_ratio=0.5, full_split=True):
     """
     Args:
         sampling (float, optional): Ratio (between 0 and 1) of data used.
@@ -65,18 +65,33 @@ def import_datas_cardfraud(sampling=1, test_ratio=0.5):
     Y[Y == 0] = 1
     print("Avant sampling :\nNombre de données positive : {}\nNombre de données négatives : {}\nPourcentage négative sur positive : {}%".format(np.sum(Y == 1), np.sum(Y == -1), 100 * np.sum(Y == -1) / np.sum(Y == 1)))
 
+    if full_split:
     # Split des données :
-    x_train, x_test, y_train, y_test = skms.train_test_split(X, Y, test_size=test_ratio) #, random_state=42)
-    x_train = x_train[:int(sampling * x_train.shape[0]), :]
-    x_test = x_test[:int(sampling * x_test.shape[0]), :]
-    y_train = y_train[:int(sampling * len(y_train))]
-    y_test = y_test[:int(sampling * len(y_test))]
+        x_train, x_test, y_train, y_test = skms.train_test_split(X, Y, test_size=test_ratio) #, random_state=42)
+        x_train = x_train[:int(sampling * x_train.shape[0]), :]
+        x_test = x_test[:int(sampling * x_test.shape[0]), :]
+        y_train = y_train[:int(sampling * len(y_train))]
+        y_test = y_test[:int(sampling * len(y_test))]
 
-    X = np.vstack((x_train, x_test))
-    Y = np.hstack((y_train, y_test))
-    print("Après sampling :\nNombre de données positive : {}\nNombre de données négatives : {}\nPourcentage négative sur positive : {}%".format(np.sum(Y == 1), np.sum(Y == -1), 100 * np.sum(Y == -1) / np.sum(Y == 1)))
+        X = np.vstack((x_train, x_test))
+        Y = np.hstack((y_train, y_test))
+        print("Après sampling :\nNombre de données positive : {}\nNombre de données négatives : {}\nPourcentage négative sur positive : {}%".format(np.sum(Y == 1), np.sum(Y == -1), 100 * np.sum(Y == -1) / np.sum(Y == 1)))
 
-    return X, Y, x_train, x_test, y_train, y_test
+        return X, Y, x_train, x_test, y_train, y_test
+    else:
+        X_sampled, X_reste, Y_sampled, Y_reste = skms.train_test_split(X, Y, train_size=sampling)
+
+        x_train, x_test, y_train, y_test = skms.train_test_split(X_sampled, Y_sampled, test_size=test_ratio)
+        x_test = np.vstack((x_test, X_reste[Y_reste == -1]))
+        y_test = np.hstack((y_test, Y_reste[Y_reste == -1]))
+
+        print("Après sampling:\nNombre de données positive de train : {}\nNombre de données négatives de train : {}\nNombres de données positives de test : {}\nNombres de données négatives de test : {}".format(np.sum(y_train==1), np.sum(y_train==-1), np.sum(y_test==1), np.sum(y_test==-1)))
+        
+        X = np.vstack((x_train, x_test))
+        Y = np.hstack((y_train, y_test))
+        return X, Y, x_train, x_test, y_train, y_test
+
+
 
 
 def partial_score(a, b, in_out=1):
@@ -170,8 +185,7 @@ def gen_arti(centerx=1, centery=1, sigma=0.1, nbex=1000, data_type=0, epsilon=0.
     y = y[idx]
     return data, y
 
-def gen_unbalanced(nbex_pos=100, nbex_neg=0, epsilon=0.5, data_type=0, sigma=0.1):
-    ndim = 2
+def gen_unbalanced(nbex_pos=100, nbex_neg=0, epsilon=0.5, ndim=2, data_type=0, sigma=0.1):
 
     if data_type==0:
         xpos = np.random.randn(ndim, nbex_pos)
