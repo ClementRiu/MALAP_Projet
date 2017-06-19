@@ -89,3 +89,39 @@ class Nearest_Neighbours:
 		diff = npl.norm(z - data, axis = 1)
 		index_NN = np.argmin(diff)
 		return index_NN + int(index_NN >= index)
+
+if __name__ == "__main__":
+	test = 2
+
+	if test == 1 :
+		x_train, y_train = tools.gen_unbalanced(nbex_pos=1000, nbex_neg=15, epsilon=0.01, ndim=2, data_type=1, sigma=0.5)
+		x_test, y_test = tools.gen_unbalanced(nbex_pos=1000, nbex_neg=100, epsilon=0.01, ndim=2, data_type=1, sigma=0.5)
+
+	elif test == 2:
+		_, _, x_train, x_test, y_train, y_test = tools.import_datas_cardfraud(sampling=0.04, test_ratio=0.40, full_split=False)
+
+	vn_score_tab = []
+	vp_score_tab = []
+
+	a_range = [0.01, 0.02, 0.03, 0.05, 0.07, 0.09, 0.1, 0.2, 0.3, 0.4, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.8, 9, 9.5, 10, 15, 30, 45, 60, 75, 90, 100]
+	
+	for a in a_range:
+		print(a)
+		cl = Nearest_Neighbours(alpha=a)
+		cl.fit(x_train, y_train)
+		y_predit = cl.predict(x_test)
+
+		vp_score = tools.partial_score(y_test, y_predit, 1)
+		vn_score = tools.partial_score(y_test, y_predit, -1)
+
+		vp_score_tab.append(vp_score)
+		vn_score_tab.append(vn_score)
+
+	plt.figure()
+	plt.semilogx(a_range, vn_score_tab, "--", label=r"Vrai négatif", color=tools.colors[0])
+	plt.semilogx(a_range, vp_score_tab, label=r"Vrai positif", color=tools.colors[0])
+	plt.xlabel(r"Valeur de $\alpha$")
+	plt.ylabel("Précision")
+	plt.title(r"Évolution de la précision en fonction du coefficient $\alpha$.", wrap=True)
+	plt.legend()
+	plt.show()

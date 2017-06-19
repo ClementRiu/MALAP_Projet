@@ -1,4 +1,5 @@
 __pycache__/
+.ipynb_checkpoints/
 nearest_neighbours_temp.py
 tree.dot
 
