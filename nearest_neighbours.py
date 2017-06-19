@@ -1,5 +1,6 @@
 import numpy as np
 import numpy.linalg as npl
+
 import matplotlib.collections as mc
 import matplotlib.pyplot as plt
 
@@ -91,7 +92,7 @@ class Nearest_Neighbours:
 		return index_NN + int(index_NN >= index)
 
 if __name__ == "__main__":
-	test = 2
+	test = 3
 
 	if test == 1 :
 		x_train, y_train = tools.gen_unbalanced(nbex_pos=1000, nbex_neg=15, epsilon=0.01, ndim=2, data_type=1, sigma=0.5)
@@ -99,6 +100,9 @@ if __name__ == "__main__":
 
 	elif test == 2:
 		_, _, x_train, x_test, y_train, y_test = tools.import_datas_cardfraud(sampling=0.04, test_ratio=0.40, full_split=False)
+
+	elif test == 3:
+		_, _, x_train, x_test, y_train, y_test = tools.import_datas_arrhythmia(test_ratio=0.40)
 
 	vn_score_tab = []
 	vp_score_tab = []

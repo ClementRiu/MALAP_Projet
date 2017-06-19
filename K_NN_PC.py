@@ -1,5 +1,6 @@
 import numpy as np
 import numpy.linalg as npl
+
 import matplotlib.collections as mc
 import matplotlib.pyplot as plt
 
@@ -93,7 +94,7 @@ class K_NN_PC:
 
 
 if __name__ == "__main__":
-	test = 1
+	test = 3
 
 	if test == 1 :
 		x_train, y_train = tools.gen_unbalanced(nbex_pos=1000, nbex_neg=15, epsilon=0.01, ndim=2, data_type=1, sigma=0.5)
@@ -102,12 +103,15 @@ if __name__ == "__main__":
 	elif test == 2:
 		_, _, x_train, x_test, y_train, y_test = tools.import_datas_cardfraud(sampling=0.04, test_ratio=0.40, full_split=False)
 
+	elif test == 3:
+		_, _, x_train, x_test, y_train, y_test = tools.import_datas_arrhythmia(test_ratio=0.40)
+
 	vn_score_tab = []
 	vp_score_tab = []
 
 	# k_range = [1]
 	# k_range = [2, 3, 4, 5, 6]
-	k_range = [10, 20, 50, 100, 200]
+	k_range = [7, 10, 20, 40, 60, ]
 
 	a_range = [0.01, 0.02, 0.03, 0.05, 0.07, 0.09, 0.1, 0.2, 0.3, 0.4, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.8, 9, 9.5, 10, 15, 30, 45, 60, 75, 90, 100]
 	
@@ -129,8 +133,8 @@ if __name__ == "__main__":
 	if print1b1:
 		for k_index in range(len(k_range)):
 			plt.figure()
-			plt.semilogx(a_range, vn_score_tab[k_index * len(a_range) : (k_index + 1) * len(a_range)], "--", label=r"Vrai négatif : k = "+str(k_range[k_index]), color=tools.colors[k_index])
-			plt.semilogx(a_range, vp_score_tab[k_index * len(a_range) : (k_index + 1) * len(a_range)], label=r"Vrai positif : k = "+str(k_range[k_index]), color=tools.colors[k_index])
+			plt.semilogx(a_range, vn_score_tab[k_index * len(a_range) : (k_index + 1) * len(a_range)], "--", label=r"Vrai négatif : k = " + str(k_range[k_index]), color=tools.colors[k_index])
+			plt.semilogx(a_range, vp_score_tab[k_index * len(a_range) : (k_index + 1) * len(a_range)], label=r"Vrai positif : k = " + str(k_range[k_index]), color=tools.colors[k_index])
 			plt.xlabel(r"Valeur de $\alpha$")
 			plt.ylabel("Précision")
 			plt.title(r"Évolution de la précision en fonction du nombre de plus proche voisin et du coefficient $\alpha$.", wrap=True)
@@ -139,8 +143,8 @@ if __name__ == "__main__":
 	else:
 		plt.figure()
 		for k_index in range(len(k_range)):
-			plt.semilogx(a_range, vn_score_tab[k_index * len(a_range) : (k_index + 1) * len(a_range)], "--", label=r"Vrai négatif : k = "+str(k_range[k_index]), color=tools.colors[k_index])
-			plt.semilogx(a_range, vp_score_tab[k_index * len(a_range) : (k_index + 1) * len(a_range)], label=r"Vrai positif : k = "+str(k_range[k_index]), color=tools.colors[k_index])
+			plt.semilogx(a_range, vn_score_tab[k_index * len(a_range) : (k_index + 1) * len(a_range)], "--", label=r"Vrai négatif : k = " + str(k_range[k_index]), color=tools.colors[k_index])
+			plt.semilogx(a_range, vp_score_tab[k_index * len(a_range) : (k_index + 1) * len(a_range)], label=r"Vrai positif : k = " + str(k_range[k_index]), color=tools.colors[k_index])
 		plt.xlabel(r"Valeur de $\alpha$")
 		plt.ylabel("Précision")
 		plt.title(r"Évolution de la précision en fonction du nombre de plus proche voisin et du coefficient $\alpha$.", wrap=True)
