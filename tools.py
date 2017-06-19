@@ -16,7 +16,7 @@ def import_datas_cardfraud(sampling=1, test_ratio=0.5, full_split=True):
     """
     Args:
         sampling (float, optional): Ratio (between 0 and 1) of data used.
-    
+
     Returns:
         ndarray: X, x_train, x_test: datas descriptor
         ndarray: Y, y_train, y_test: datas label
@@ -86,12 +86,63 @@ def import_datas_cardfraud(sampling=1, test_ratio=0.5, full_split=True):
         y_test = np.hstack((y_test, Y_reste[Y_reste == -1]))
 
         print("Après sampling:\nNombre de données positive de train : {}\nNombre de données négatives de train : {}\nNombres de données positives de test : {}\nNombres de données négatives de test : {}".format(np.sum(y_train==1), np.sum(y_train==-1), np.sum(y_test==1), np.sum(y_test==-1)))
-        
+
         X = np.vstack((x_train, x_test))
         Y = np.hstack((y_train, y_test))
         return X, Y, x_train, x_test, y_train, y_test
 
 
+def import_datas_arrhythmia(sampling=1, test_ratio=0.5, full_split=True):
+    """
+    Args:
+        sampling (float, optional): Ratio (between 0 and 1) of data used.
+
+    Returns:
+        ndarray: X, x_train, x_test: datas descriptor
+        ndarray: Y, y_train, y_test: datas label
+    """
+
+    ### Données arrhythmia : le fichier Datasets ne doit pas avoir été bougé.
+    print("Import des données Arrhythmia...")
+    arrhythmia = pd.read_csv("Arrhythmia/arrhythmia.csv")
+
+    X_col_list = [str(i) for i in range(1, 277)]
+
+    X = pd.DataFrame.as_matrix(arrhythmia[X_col_list])
+    Y = pd.DataFrame.as_matrix(arrhythmia["Label"])
+
+    # Transformation des résultats de façon à ce que la classe positive soit +1 et la classe négative -1 :
+    # Attention, ce passage est spécifique à la structure des données fournies (une fonction plus générale va arriver plus tard)
+    Y[Y == 1] = 1
+    Y[Y != 1] = -1
+
+    print("Avant sampling :\nNombre de données positive : {}\nNombre de données négatives : {}\nPourcentage négative sur positive : {}%".format(np.sum(Y == 1), np.sum(Y == -1), 100 * np.sum(Y == -1) / np.sum(Y == 1)))
+
+    if full_split:
+    # Split des données :
+        x_train, x_test, y_train, y_test = skms.train_test_split(X, Y, test_size=test_ratio) #, random_state=42)
+        x_train = x_train[:int(sampling * x_train.shape[0]), :]
+        x_test = x_test[:int(sampling * x_test.shape[0]), :]
+        y_train = y_train[:int(sampling * len(y_train))]
+        y_test = y_test[:int(sampling * len(y_test))]
+
+        X = np.vstack((x_train, x_test))
+        Y = np.hstack((y_train, y_test))
+        print("Après sampling :\nNombre de données positive : {}\nNombre de données négatives : {}\nPourcentage négative sur positive : {}%".format(np.sum(Y == 1), np.sum(Y == -1), 100 * np.sum(Y == -1) / np.sum(Y == 1)))
+
+        return X, Y, x_train, x_test, y_train, y_test
+    else:
+        X_sampled, X_reste, Y_sampled, Y_reste = skms.train_test_split(X, Y, train_size=sampling)
+
+        x_train, x_test, y_train, y_test = skms.train_test_split(X_sampled, Y_sampled, test_size=test_ratio)
+        x_test = np.vstack((x_test, X_reste[Y_reste == -1]))
+        y_test = np.hstack((y_test, Y_reste[Y_reste == -1]))
+
+        print("Après sampling:\nNombre de données positive de train : {}\nNombre de données négatives de train : {}\nNombres de données positives de test : {}\nNombres de données négatives de test : {}".format(np.sum(y_train==1), np.sum(y_train==-1), np.sum(y_test==1), np.sum(y_test==-1)))
+
+        X = np.vstack((x_train, x_test))
+        Y = np.hstack((y_train, y_test))
+        return X, Y, x_train, x_test, y_train, y_test
 
 
 def partial_score(a, b, in_out=1):
@@ -116,7 +167,7 @@ def plot_data(data, labels=None, dec=0):
     for i, l in enumerate(sorted(list(set(labels.flatten())))):
         # plt.scatter(data[labels == l, 0], data[labels == l, 1], c=cols[dec+i], marker=marks[dec+i])
         plt.scatter(data[labels == l, 0], data[labels == l, 1], c=cols[dec+i], marker=marks[dec+i])
-        
+
 def plot_frontiere(data,f,step=20):
     """ Trace un graphe de la frontiere de decision de f
     :param data: donnees
@@ -175,7 +226,7 @@ def gen_arti(centerx=1, centery=1, sigma=0.1, nbex=1000, data_type=0, epsilon=0.
         data = np.reshape(np.random.uniform(-4, 4, 2 * nbex), (nbex, 2))
         y = np.ceil(data[:, 0]) + np.ceil(data[:, 1])
         y = 2 * (y % 2) - 1
-    
+
     # un peu de bruit
     data[:, 0] += np.random.normal(0, epsilon, nbex)
     data[:, 1] += np.random.normal(0, epsilon, nbex)
